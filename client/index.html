@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>writeUP</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <img class="logo" src="./assets//NavigationBar/logo.png" alt="writeUP">
+
+        <h2 class="title">writeUP</h2>
+
+        <div class="options">
+            <button><img src="./assets/NavigationBar/profileLogo.png"></button>
+            <button><img src="./assets/NavigationBar/settingsLogo.png"></button>
+            <button><img src="./assets/NavigationBar/logoutLogo.png"></button>
+        </div>
+    </nav>
+
+    <div class="app-layout">
+    <div class="draw-canvas">
+        <div class="toolbar">
+            <button class ="tools" id="pencil">
+                <img src="./assets/toolbar/pencil-icon.png" alt="Pencil">
+            </button>
+            <button class ="tools" id="eraser">
+                <img src="./assets/toolbar/eraser-icon.png" alt="Eraser">
+            </button>
+            <button class="tools" id="black"></button>
+            <button class="tools" id="blue"></button>
+            <button class="tools" id="red"></button>
+            <button class="tools" id="green"></button>
+            <button class="tools" id="pink"></button>
+            <button class="tools" id="clear">Clear</button>
+            <button class="tools" id="restore">Restore</button>
+            <button class="tools" id="undo">Undo</button>
+            <button class="tools" id="redo">Redo</button>
+
+        </div>
+        <canvas id="writecanvas"></canvas>
+    </div>
+
+    <div class="users">
+        <h1>Users</h1>
+    </div>
+</div>
+
+
+<script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>
+<script src="javascript/canvas.js"></script>
+</body>
+</html>

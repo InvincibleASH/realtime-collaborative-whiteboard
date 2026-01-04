@@ -1,0 +1,168 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    background: linear-gradient(to right,black, white, black);
+}
+
+.navbar {
+    height: 64px;
+    width: 100%;
+    background: linear-gradient(to right, white, black, white);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    padding: 0 1rem;
+}
+
+.logo {
+    height: 40px;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+}
+
+.title {
+    text-align: center;
+    font-size: 30px;
+    font-weight: 600;
+    color:beige;
+}
+
+.options {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.options button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.options img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.app-layout {
+    display: flex;
+    width: 100%;
+    height: calc(100vh - 64px);
+    gap: 1%;
+    border: 2px solid #000000;
+}
+
+
+.draw-canvas {
+    flex: 1;
+    border: 3px solid #000000;
+    background: white;
+    width: 70%;
+    height: 93%;
+    margin-top: 2%;
+    margin-left: 2%;
+    border-radius: 3%;
+    overflow: hidden;
+    box-shadow: 0 8px 9px rgba(0, 0, 0, 0.15);
+}
+
+.toolbar {
+    height: 50px;
+    width: 100%;
+    background: linear-gradient(to right,grey, white, grey);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 8px;
+    border-bottom: 1px solid #000;
+}
+
+
+.users {
+    border-left: 2px solid #000000;
+    width: 20%;
+    background: linear-gradient(white, rgb(49, 46, 46));
+    height: 100%;
+}
+.users h1{
+    font-size: 40px;
+    text-decoration: wavy;
+}
+
+#writecanvas {
+    width: 100%;
+    height: calc(100% - 50px);
+    display: block;
+    background: white;
+    user-select: none;
+    cursor: crosshair;
+}
+
+.tools {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tools img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+#black {
+    background: black;
+    border: none;
+    border-radius: 100%;
+    width: 18px;
+    height: 18px;
+    margin:10px;
+}
+
+#red {
+    background: red;
+    border: none;
+    border-radius: 100%;
+    width: 18px;
+    height: 18px;
+    margin:10px;
+}
+
+#green {
+    background: green;
+    border: none;
+    border-radius: 100%;
+    width: 18px;
+    height: 18px;
+    margin:10px;
+}
+#pink {
+    background: pink;
+    border: none;
+    border-radius: 100%;
+    width: 18px;
+    height: 18px;
+    margin:10px;
+}
+#blue {
+    background: blue;
+    border: none;
+    border-radius: 100%;
+    width: 18px;
+    height: 18px;
+    margin:10px;
+}
