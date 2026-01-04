@@ -41,13 +41,62 @@ io.on("connection", (socket) => {
     socket.emit("INIT_STROKES", rooms[roomId].strokes);
   });
 
-  socket.on("DRAW_STROKE", (stroke) => {
-    const roomId = socket.roomId;
-    if (!roomId || !rooms[roomId]) return;
+  socket.on("CLEAR_CANVAS", () => {
+  const roomId = socket.roomId;
+  if (!roomId || !rooms[roomId]) return;
 
-    rooms[roomId].strokes.push(stroke);
-    socket.to(roomId).emit("DRAW_STROKE", stroke);
-  });
+  rooms[roomId].strokes = [];
+
+  io.to(roomId).emit("CANVAS_CLEARED");
+});
+
+
+socket.on("DRAW_STROKE", (stroke) => {
+  const roomId = socket.roomId;
+  if (!roomId || !rooms[roomId]) return;
+
+  const serverStroke = {
+    ...stroke,
+    ownerId: socket.id,
+  };
+
+  rooms[roomId].strokes.push(serverStroke);
+
+  io.to(roomId).emit("DRAW_STROKE", serverStroke);
+});
+
+
+socket.on("UNDO_STROKE", () => {
+  const roomId = socket.roomId;
+  if (!roomId || !rooms[roomId]) return;
+
+  const strokes = rooms[roomId].strokes;
+
+  for (let i = strokes.length - 1; i >= 0; i--) {
+    if (strokes[i].ownerId === socket.id) {
+      const [removedStroke] = strokes.splice(i, 1);
+
+      io.to(roomId).emit("STROKE_REMOVED", {
+        strokeId: removedStroke.id,
+      });
+
+      break;
+    }
+  }
+});
+
+
+socket.on("REDO_STROKE", (stroke) => {
+  const roomId = socket.roomId;
+  if (!roomId || !rooms[roomId]) return;
+
+  if (stroke.ownerId !== socket.id) return;
+
+  rooms[roomId].strokes.push(stroke);
+
+  io.to(roomId).emit("DRAW_STROKE", stroke);
+});
+
 
   socket.on("disconnect", () => {
     const roomId = socket.roomId;

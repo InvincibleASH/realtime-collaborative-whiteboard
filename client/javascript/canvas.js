@@ -1,25 +1,35 @@
 //************************************Socket************************************************** */
 
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTU4MDA4YjUzNjBlNGQ1ZGFlNGQ4NjEiLCJpYXQiOjE3Njc0NjU3MzksImV4cCI6MTc2ODA3MDUzOX0.h7mQmhjrEdQE1HvyN6L0mdQBv6Od0de-sEeoWaemrzI";
-
-const socket = io("http://localhost:5001", {
-  auth: {
-    token: token,
-  },
-});
+const socket = io("http://localhost:5001");
 
 socket.on("connect", () => {
-  console.log("Socket connected:", socket.id);
+  let roomId = new URLSearchParams(window.location.search).get("room");
+
+  if (!roomId) {
+    roomId = crypto.randomUUID();
+    window.history.replaceState(null, "", `?room=${roomId}`);
+  }
+
+  console.log("CLIENT joining room:", roomId);
+  socket.emit("JOIN_ROOM", { roomId });
 });
+
 
 socket.on("connect_error", (err) => {
   console.error("Socket connection error:", err.message);
 });
 
+socket.on("CANVAS_CLEARED", () => {
+  clearCanvas();
+});
+
+
 //**********************************Canvas***************************************************** */
 
 let currentColor = '#000000';
 let currentTool = 'pen';
+let prevStrokes = [];
+
 
 const canvas = document.getElementById('writecanvas');
 const ctx = canvas.getContext("2d");
@@ -41,12 +51,13 @@ canvas.addEventListener('mousedown', (e) => {
     const point = { x : e.offsetX, y : e.offsetY};
 
     currentstroke = {
-        id: Date.now() + Math.random(),
+        id: crypto.randomUUID(),
         tool: currentTool,
         color: currentColor,
         width: currentTool === 'eraser' ? 30 : 2,
         points: [point]
     };
+
 });
 
 
@@ -62,22 +73,40 @@ canvas.addEventListener('mousemove', (e) => {
 });
 
 socket.on("DRAW_STROKE", (stroke) => {
+  const index = strokes.findIndex(s => s.id === stroke.id);
+
+  if (index === -1) {
     strokes.push(stroke);
-    redraw();
+  } else {
+    strokes[index] = stroke;
+  }
+
+  redraw();
 });
 
+
+socket.on("STROKE_REMOVED", ({ strokeId }) => {
+  const index = strokes.findIndex(s => s.id === strokeId);
+  if (index === -1) return;
+
+  const [removed] = strokes.splice(index, 1);
+
+  if (removed.ownerId && removed.ownerId === socket.id) {
+    redoStack.push(removed);
+  }
+
+  redraw();
+});
 
 
 document.addEventListener('mouseup', () => {
     if(!currentstroke) return;
+    const stroke  = currentstroke;
+    strokes.push(stroke);
 
-    socket.emit("DRAW_STROKE", currentstroke);
-
-    strokes.push(currentstroke);
+    socket.emit("DRAW_STROKE", stroke);
     currentstroke = null;
-
     redoStack = [];
-
     redraw();
 });
 
@@ -145,54 +174,52 @@ pink_btn.addEventListener('click', (e)=> {
 })
 
 function clearCanvas() {
+  strokes = [];
+  currentstroke = null;
+  redoStack = [];
+  redraw();
+}
 
-    prevStrokes = strokes.map(stroke => ({
+clear.addEventListener('click', () => {
+  const proceed = confirm("Do you want to clear the Canvas?");
+  if (!proceed) return;
+
+  prevStrokes = strokes.map(stroke => ({
     ...stroke,
     points: stroke.points.map(p => ({ ...p }))
-}));
-    strokes = [];
-    currentstroke = null;
-    redoStack = [];
-    redraw();
-}
-const clear = document.getElementById('clear');
-clear.addEventListener('click', ()=> {
-    const proceed = confirm(
-        "Do you want to clear the Canvas?"
-    );
+  }));
 
-    if (!proceed) return;
+  redoStack = [];
 
-    redoStack = [];
+  socket.emit("CLEAR_CANVAS");
+});
 
-    clearCanvas();
-})
 
 const restore = document.getElementById('restore');
-restore.addEventListener('click', ()=> {
-    if (!prevStrokes || prevStrokes.length === 0) return;
 
-    let proceed = false;
+restore.addEventListener('click', () => {
+  if (!prevStrokes || prevStrokes.length === 0) {
+    alert("Nothing to restore");
+    return;
+  }
 
-    if(strokes.length === 0) {
-        proceed = true;
-    }
-    else {
-        proceed = confirm(
-        "Restoring will discard the current canvas. Do you want to continue?"
-        );
-    }
+  const proceed = confirm(
+    "Restore will bring back the canvas to what it was before the last clear. Continue?"
+  );
 
-    if (!proceed) return;
+  if (!proceed) return;
 
-    strokes = prevStrokes.map(stroke => ({
-        ...stroke,
-        points: stroke.points.map(p => ({ ...p }))
-    }));
-    currentstroke = null;
-    redoStack = [];
-    redraw();
-})
+  strokes = prevStrokes.map(stroke => ({
+    ...stroke,
+    points: stroke.points.map(p => ({ ...p }))
+  }));
+
+  currentstroke = null;
+  redoStack = [];
+
+  redraw();
+});
+
 
 const pen = document.getElementById('pencil');
 pen.addEventListener('click', (e) => {
@@ -207,31 +234,19 @@ eraser.addEventListener('click', (e) => {
 //*****************************************Undo/Redo******************************************* */
  
 let redoStack = [];
-
-function undo() {
-    if(strokes.length === 0) return;
-
-    const lastStroke = strokes.pop();
-
-    redoStack.push(lastStroke);
-    redraw();
-}
-
-function redo() {
-    if(redoStack.length === 0) return;
-
-    const redoStroke = redoStack.pop();
-
-    strokes.push(redoStroke);
-    redraw();
-}
-
 const undo_btn = document.getElementById('undo');
-undo_btn.addEventListener('click', (e)=> {
-    undo();
+const redo_btn = document.getElementById('redo');
+
+
+
+undo_btn.addEventListener('click', () => {
+  socket.emit("UNDO_STROKE");
 });
 
-const redo_btn = document.getElementById('redo');
-redo_btn.addEventListener('click', (e)=> {
-    redo();
+
+redo_btn.addEventListener('click', () => {
+  const stroke = redoStack.pop();
+  if (!stroke) return;
+
+  socket.emit("REDO_STROKE", stroke);
 });
