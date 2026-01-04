@@ -81,7 +81,7 @@ rooms[roomId] = {
 ---
 
 ## Project Structure
-
+```
 writeUp/
 ├── index.js
 ├── package.json
@@ -91,7 +91,7 @@ writeUp/
 │   ├── canvas.js
 │   ├── style.css
 │   └── assets/
-
+```
 ---
 
 ## Run Locally
