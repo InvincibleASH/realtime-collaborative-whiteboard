@@ -13,12 +13,15 @@
 
         <h2 class="title">writeUP</h2>
 
-        <div class="options">
-            <button><img src="./assets/NavigationBar/profileLogo.png"></button>
-            <button><img src="./assets/NavigationBar/settingsLogo.png"></button>
-            <button><img src="./assets/NavigationBar/logoutLogo.png"></button>
+        <div class="roomsgetid">
+            <div class="room-bar">
+            <input id="roomInput" placeholder="Enter room ID" />
+            <button id="joinRoomBtn">Join</button>
+        </div>
         </div>
     </nav>
+
+
 
     <div class="app-layout">
     <div class="draw-canvas">
@@ -38,18 +41,17 @@
             <button class="tools" id="restore">Restore</button>
             <button class="tools" id="undo">Undo</button>
             <button class="tools" id="redo">Redo</button>
+            <button id="export">Export as PNG</button>
+
 
         </div>
         <canvas id="writecanvas"></canvas>
     </div>
 
-    <div class="users">
-        <h1>Users</h1>
-    </div>
 </div>
 
 
 <script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>
-<script src="javascript/canvas.js"></script>
+<script src="canvas.js"></script>
 </body>
 </html>

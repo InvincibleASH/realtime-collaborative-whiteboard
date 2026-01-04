@@ -166,3 +166,43 @@ html, body {
     height: 18px;
     margin:10px;
 }
+
+/* ===== Room Join Bar ===== */
+.room-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  padding: 8px 12px;
+}
+
+.room-bar input {
+  flex: 1;
+  max-width: 220px;
+
+  padding: 6px 10px;
+  font-size: 14px;
+
+  border-radius: 4px;
+  outline: none;
+}
+
+.room-bar input:focus {
+  border-color: #555;
+}
+
+.room-bar button {
+  padding: 6px 14px;
+  font-size: 14px;
+
+  background: #222;
+  color: #fff;
+
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.room-bar button:hover {
+  background: #000;
+}
